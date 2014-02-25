@@ -1,8 +1,6 @@
-all: dog
-
 # add flex library (libfl) to avoid undefined 
 # reference to `yywrap'.
-dog: dog.tab.o lex.yy.o 
+dogcc: dog.tab.o lex.yy.o 
 	gcc $^ -lfl -o $@ 
 
 %.o: %.c
@@ -16,4 +14,4 @@ dog.tab.h dog.tab.c: dog.y
 	bison -d dog.y
 
 clean:
-	find . \( ! -type d \) -a ! \( -name "*.y" -o -name "*.l" -o -name "Makefile" -o -name "*.swp" -o -name "*.md" -o -name "*.dog" \) | xargs rm -f
+	find . -mindepth 1 \( -path './.git' -o -name "*.y" -o -name "*.l" -o -name "Makefile" -o -name "*.swp" -o -name "*.md" -o -name "*.dog" \) -prune -o -print | xargs rm -f
