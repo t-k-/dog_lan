@@ -6,7 +6,7 @@ extern FILE *yyin;
 %}
 
 %error-verbose
-%union { char somewhere[64]; }
+%union { char somewhere[128]; }
 
 %token DOG GO 
 %token <somewhere> WHERE 
