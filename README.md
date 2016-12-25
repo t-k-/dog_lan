@@ -1,6 +1,8 @@
 About
 =========
-dog command language is an object oriented language. This source code is for dog command language compiler `dogcc`.
+dog command language is an object oriented language.
+
+This source code is for dog command language compiler `dogcc`.
 
 Build Status
 ===========
