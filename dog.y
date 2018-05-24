@@ -3,26 +3,47 @@
 #include <stdlib.h>
 
 extern FILE *yyin;
+extern int yylex (void);
+extern int yyerror(const char *msg);
 %}
 
 %error-verbose
-%union { char somewhere[128]; }
+%union { char token[1024]; }
 
-%token DOG GO 
-%token <somewhere> WHERE 
-%type <somewhere> expr 
-%type <somewhere> atomic 
-%token SEMICOLON 
+%token _FOREACH
+%token <token> TOKEN
+%token <token> NAME
 
 %%
-program: stmtlist;
-stmtlist : | stmtlist stmt ;
-stmt   : DOG GO expr SEMICOLON {printf("dog goes %s.\n", $3);};
-expr   : atomic ;
-atomic : WHERE ;
+program
+	: statements;
+
+statements
+	:
+	| statements statement
+	;
+
+statement
+	: TOKEN { printf("%s ", $1); }
+	| NAME { printf("%s ", $1); }
+	| _FOREACH '(' NAME ',' NAME ',' NAME ')' block
+		{
+			printf("[for each (%s)(%s)(%s)]", $3, $5, $7);
+		}
+	| block {}
+	| ','  { printf(", "); }
+	| '('  { printf("( "); }
+	| ')'  { printf(") "); }
+	| '\n' { printf("\n"); }
+	| '\t' { printf("\t"); }
+	;
+
+block
+	: '{' statements '}'  { printf("[block]"); }
+	;
 %%
 
-int yyerror(char *msg)
+int yyerror(const char *msg)
 {  fprintf(stderr,"Error: %s\n",msg);
    return 0;
 }
