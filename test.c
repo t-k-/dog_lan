@@ -13,7 +13,7 @@
 	list_len(li)
 	list_sort(li, cmp_foo)
 
-	for_each(iter, list, li) {
+	foreach(iter, list, li) {
 		ele -> element(iter, struct T);
 		printf("%d\n", ele->i);
 		list_tail(iter)
