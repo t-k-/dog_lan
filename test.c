@@ -6,7 +6,7 @@
 		struct list_iterator g = list_generator(li);
 		do {
 			struct T *t = MEMBER_2_STRUCT(g.cur.now, struct T, ln);
-			printf("%d\n", t->i);
+			printf("item %d \n", t->i);
 		} while (list_next(li, &g));
 	}
 

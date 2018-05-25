@@ -19,81 +19,25 @@ WS  [ \t\v\n\f]
 #include "dog.tab.h"
 
 #define COPY strcpy(yylval.token, yytext)
+#define PRINT if (yytext[0] == '\n') printf("\n"); else printf("[%s]", yytext)
 %}
 
 %%
 
-"\n"                                   { return '\n'; }
-"\t"                                   { return '\t'; }
-"/*"                                   { COPY; return TOKEN; }
-"*/"                                   { COPY; return TOKEN; }
-"//".*                                 { COPY; return TOKEN; }
-"#".*                                  { COPY; return TOKEN; }
+"//".*                                 { PRINT; COPY; return TOKEN; }
+({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+      { PRINT; COPY; return TOKEN; }
 
-for_each                                { return _FOREACH; }
+for_each                               { return _FOREACH; }
 
-{L}{A}*                                { COPY; return NAME; }
-{HP}{H}+{IS}?                          { COPY; return TOKEN; }
-{NZ}{D}*{IS}?                          { COPY; return TOKEN; }
-"0"{O}*{IS}?                           { COPY; return TOKEN; }
-{CP}?"'"([^'\\\n]|{ES})+"'"            { COPY; return TOKEN; }
+","                                    { PRINT; return ','; }
+"("                                    { PRINT; return '('; }
+")"                                    { PRINT; return ')'; }
+"{"                                    { PRINT; return '{'; }
+"}"                                    { PRINT; return '}'; }
 
-{D}+{E}{FS}?                           { COPY; return TOKEN; }
-{D}*"."{D}+{E}?{FS}?                   { COPY; return TOKEN; }
-{D}+"."{E}?{FS}?                       { COPY; return TOKEN; }
-{HP}{H}+{P}{FS}?                       { COPY; return TOKEN; }
-{HP}{H}*"."{H}+{P}{FS}?                { COPY; return TOKEN; }
-{HP}{H}+"."{P}{FS}?                    { COPY; return TOKEN; }
-
-({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+      { COPY; return TOKEN; }
-
-","                    { return ','; }
-"("                    { return '('; }
-")"                    { return ')'; }
-"{"                    { return '{'; }
-"}"                    { return '}'; }
-
-"..."                  { COPY; return TOKEN; }
-">>="                  { COPY; return TOKEN; }
-"<<="                  { COPY; return TOKEN; }
-"+="                   { COPY; return TOKEN; }
-"-="                   { COPY; return TOKEN; }
-"*="                   { COPY; return TOKEN; }
-"/="                   { COPY; return TOKEN; }
-"%="                   { COPY; return TOKEN; }
-"&="                   { COPY; return TOKEN; }
-"^="                   { COPY; return TOKEN; }
-"|="                   { COPY; return TOKEN; }
-">>"                   { COPY; return TOKEN; }
-"<<"                   { COPY; return TOKEN; }
-"++"                   { COPY; return TOKEN; }
-"--"                   { COPY; return TOKEN; }
-"->"                   { COPY; return TOKEN; }
-"&&"                   { COPY; return TOKEN; }
-"||"                   { COPY; return TOKEN; }
-"<="                   { COPY; return TOKEN; }
-">="                   { COPY; return TOKEN; }
-"=="                   { COPY; return TOKEN; }
-"!="                   { COPY; return TOKEN; }
-";"                    { COPY; return TOKEN; }
-":"                    { COPY; return TOKEN; }
-"="                    { COPY; return TOKEN; }
-"["                    { COPY; return TOKEN; }
-"]"                    { COPY; return TOKEN; }
-"."                    { COPY; return TOKEN; }
-"&"                    { COPY; return TOKEN; }
-"!"                    { COPY; return TOKEN; }
-"~"                    { COPY; return TOKEN; }
-"-"                    { COPY; return TOKEN; }
-"+"                    { COPY; return TOKEN; }
-"*"                    { COPY; return TOKEN; }
-"/"                    { COPY; return TOKEN; }
-"%"                    { COPY; return TOKEN; }
-"<"                    { COPY; return TOKEN; }
-">"                    { COPY; return TOKEN; }
-"^"                    { COPY; return TOKEN; }
-"|"                    { COPY; return TOKEN; }
-"?"                    { COPY; return TOKEN; }
-.                      { /* escape */ }
+"\n"                                   { PRINT; return '\n'; }
+"\t"                                   { PRINT; return '\t'; }
+[ ]+                                   { PRINT; return ' ';}
+[^ \t\n,(){}]+                { PRINT; COPY; return TOKEN; }
 
 %%

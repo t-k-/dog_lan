@@ -24,24 +24,27 @@ statements
 	;
 
 statement
-	: TOKEN { printf("%s ", $1); }
-	| NAME { printf("%s ", $1); }
-	| _FOREACH '(' NAME ',' NAME ',' NAME ')' block
-		{
-			printf("[for each (%s)(%s)(%s)]", $3, $5, $7);
-		}
+	: TOKEN {}
 	| block {}
-	| ','  { printf(", "); }
-	| '('  { printf("( "); }
-	| ')'  { printf(") "); }
-	| '\n' { printf("\n"); }
-	| '\t' { printf("\t"); }
+	| ' '  { }
+	| ','  { }
+	| '('  { }
+	| ')'  { }
+	| '\n' { }
+	| '\t' { }
 	;
 
 block
 	: '{' statements '}'  { printf("[block]"); }
 	;
 %%
+/*
+	| NAME { printf("%s ", $1); }
+	| _FOREACH '(' NAME ',' NAME ',' NAME ')' block
+		{
+			printf("[for each (%s)(%s)(%s)]", $3, $5, $7);
+		}
+*/
 
 int yyerror(const char *msg)
 {  fprintf(stderr,"Error: %s\n",msg);
