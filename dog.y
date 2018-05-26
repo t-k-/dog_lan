@@ -8,10 +8,23 @@ extern int yylex (void);
 extern int yyerror(const char *msg);
 
 char *strcatdup(char*, char*);
+
+struct list_node {
+	struct list_node *next;
+	char token[512];
+};
+
+struct list_node *new_list_node(char*);
+struct list_node *list_push_front(struct list_node **, char*);
+void list_free(struct list_node*);
 %}
 
 %error-verbose
-%union { char token[512]; char *text; }
+%union {
+	char token[512];
+	char *text;
+	struct list_node *list;
+}
 
 %token _FOREACH
 %token <token> TOKEN
@@ -20,7 +33,7 @@ char *strcatdup(char*, char*);
 %type <token> token
 %type <text> tokens
 %type <text> block
-%type <text> namelist
+%type <list> namelist
 %type <text> foreach
 
 %destructor { printf("\n\n%s\n", $$); } <text>
@@ -51,16 +64,54 @@ block
 	;
 
 namelist
-	: NAME { $$ = strdup($1); }
-	| namelist ',' NAME { $$ = strcatdup($1, $3); free($1); }
+	: NAME { $$ = new_list_node($1); }
+	| namelist ',' NAME {
+		$$ = list_push_front(&($1), $3);
+	}
 	;
 
 foreach
-	: _FOREACH '(' namelist ')' { $$ = strcatdup("[foreach] (", $3); free($3); }
+	: _FOREACH '(' namelist ')' block {
+		$$ = strcatdup("[foreach] ", $5);
+
+		for (struct list_node *p = $3; p != NULL; p = p->next) {
+			printf("%s ", p->token);
+		}
+		printf("\n");
+
+		list_free($3);
+	}
 	;
 %%
 /*
 */
+
+struct list_node *list_push_front(struct list_node **head, char *token)
+{
+	struct list_node *p = *head;
+	*head = new_list_node(token);
+	(*head)->next = p;
+	return *head;
+}
+
+struct list_node *new_list_node(char *token)
+{
+	struct list_node *ret = malloc(sizeof(struct list_node));
+	ret->next = NULL;
+	strcpy(ret->token, token);
+
+	return ret;
+}
+
+void list_free(struct list_node *head)
+{
+	struct list_node *next;
+	while (head) {
+		next = head->next;
+		free(head);
+		head = next;
+	}
+}
 
 char *strcatdup(char *orig, char *cat)
 {
@@ -82,7 +133,7 @@ int main(int argc,char *argv[])
 	if(argc != 2) {
 		printf("Please specify the input file.\n");
 		return 1;
-	} else { 
+	} else {
 		fp = fopen(argv[1],"r");
 
 		if(!fp)
