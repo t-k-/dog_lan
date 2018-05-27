@@ -18,6 +18,10 @@ WS  [ \t\v\n\f]
  /* comments */
 "//".*                                 { PRINT; COPY; return TOKEN; }
 
+ /* special treatment for C */
+"\\""\n"                               { COPY; return TOKEN; }
+"#define"[ ]+{L}{A}*"("                { COPY; return TOKEN; }
+
  /* quoted string */
 ({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+      { PRINT; COPY; return TOKEN; }
 
@@ -33,6 +37,7 @@ foreach                                { return _FOREACH; }
 ")"                                    { PRINT; return ')'; }
 "{"                                    { PRINT; return '{'; }
 "}"                                    { PRINT; return '}'; }
+"\n"                                   { PRINT; return '\n'; }
 
  /* spaces */
 

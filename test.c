@@ -1,5 +1,7 @@
 #import moduleA
-// list_len, list_sort, list_generator ...
+
+#define macro(_a, _b, _c) \
+	_a ## _b ## _c
 
 	/* generic for */
 	{
@@ -16,8 +18,8 @@
 	foreach(iter, list, li) {
 		ele -> element(iter, struct T);
 		printf("%d\n", ele->i);
-		list_tail(iter)
-		list_head(iter)
+		list_tail(iter);
+		list_head(iter);
 		continue;
 		break;
 	}
