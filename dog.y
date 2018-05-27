@@ -2,12 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 extern FILE *yyin;
 extern int yylex (void);
 extern int yyerror(const char *msg);
 
-char *strcatdup(char*, char*);
+char *tokcat(int, ...);
 
 struct list_node {
 	struct list_node *next;
@@ -40,13 +41,13 @@ void list_free(struct list_node*);
 
 %%
 program
-	: tokens { printf("# program #\n%s", $1); } ;
+	: tokens { printf("%s", $1); free($1); } ;
 
 tokens
 	: { $$ = strdup(""); }
-	| tokens token { $$ = strcatdup($1, $2); free($1); }
-	| tokens block { $$ = strcatdup($1, $2); free($1); free($2); }
-	| tokens foreach { $$ = strcatdup($1, $2); free($1); free($2); }
+	| tokens token   { $$ = tokcat(2, $1, $2); free($1); }
+	| tokens block   { $$ = tokcat(4, $1, "{", $2, "}"); free($1); free($2); }
+	| tokens foreach { $$ = tokcat(4, $1, "{", $2, "}"); free($1); free($2); }
 	;
 
 token
@@ -60,7 +61,7 @@ token
 	;
 
 block
-	: '{' tokens '}' { $$ = strcatdup("[block] {", $2); free($2); }
+	: '{' tokens '}' { $$ = $2; }
 	;
 
 namelist
@@ -72,12 +73,12 @@ namelist
 
 foreach
 	: _FOREACH '(' namelist ')' block {
-		$$ = strcatdup("[foreach] ", $5);
+		$$ = strdup($5);
 
-		for (struct list_node *p = $3; p != NULL; p = p->next) {
-			printf("%s ", p->token);
-		}
-		printf("\n");
+//		for (struct list_node *p = $3; p != NULL; p = p->next) {
+//			printf("%s ", p->token);
+//		}
+//		printf("\n");
 
 		list_free($3);
 	}
@@ -113,40 +114,57 @@ void list_free(struct list_node *head)
 	}
 }
 
-char *strcatdup(char *orig, char *cat)
+char *tokcat(int num, ...)
 {
-	char *ret = malloc(strlen(orig) + strlen(cat) + 1 /* space */ + 1 /* NULL */);
-	strcpy(ret, orig);
-	strcat(ret, " ");
-	strcat(ret, cat);
+	va_list vali;
+	int len = 1; /* NULL */
+
+	va_start(vali, num);
+	for (int i = 0; i < num; i++) {
+		char *str = va_arg(vali, char*);
+		len += strlen(str) + 1 /* space */;
+	}
+	va_end(vali);
+
+	char *ret = malloc(len);
+	ret[0] = '\0';
+
+	va_start(vali, num);
+	for (int i = 0; i < num; i++) {
+		char *str = va_arg(vali, char*);
+		int l = strlen(ret);
+		if (l != 0 && ret[l - 1] != '\n')
+			strcat(ret, " ");
+		strcat(ret, str);
+	}
+	va_end(vali);
+
 	return ret;
 }
 
 int yyerror(const char *msg)
-{  fprintf(stderr,"Error: %s\n",msg);
-   return 0;
+{
+	fprintf(stderr,"Error: %s\n",msg);
+	return 0;
 }
 
 int main(int argc,char *argv[])
 {
 	FILE *fp;
+
 	if(argc != 2) {
 		printf("Please specify the input file.\n");
 		return 1;
 	} else {
-		fp = fopen(argv[1],"r");
-
-		if(!fp)
-		{
+		fp = fopen(argv[1], "r");
+		if(!fp) {
 			printf("couldn't open file for reading. \n");
 			return 1;
 		}
-
-		yyin=fp;
+		yyin = fp;
 	}
 	
 	yyparse();
 	fclose(fp);
-
 	return 0;
 }
