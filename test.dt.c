@@ -29,9 +29,14 @@ typedef int32_t i32;
 
 #require "hello.h"
 
-void foo(); // automatic forward-declaration
+struct bar {
+	i32 abd;
+}
 
-dict_t foo()
+void foo(struct bar b); // automatic forward-declaration
+// #(put just above the first function.)
+
+dict_t foo(struct bar b)
 {
 	list_t li = #list();
 
@@ -41,29 +46,22 @@ dict_t foo()
 	list_push_front(li, );
 	list_push_back(li, );
 	list_detach(li, );
-
-	#sort(list, li, iter1, iter2) {
-		return iter1 > iter2;
-	}
+	list_t sorted_li = list_sort(li, callbk);
 
 	#foreach (iter, list, li) {
 		list_detach();
 		free(item);
 	}
 
-
-	dict_t d = #dict(
-		"*age" = strdup(12),
-		"ex" = list("ammy", "bob", "tim")
-	);
+	dict_t d = #box {
+		"name" = 12;
+		"-age" = strdup(12);
+		"ex" = list("ammy", "bob", "tim");
+	};
 
 	free(d#["age"]);
 
-//	void *k = a.key("age");
-//	*k = malloc(sizeof(int));
-//	*(*k) = 12;
-
-	d#["age"] = #new(int, 12);
+	d#["age"] = #malloc(int);
 	d#["ex"] = #list("ammy", "bob", "tim");
 	return d;
 }
@@ -73,14 +71,10 @@ int main()
 	int age;
 	list ex;
 	char *err;
-	#catch (age, ex) { foo() } {
-		ABORT_ON_ERROR;
+	#unbox (age, ex, err) {
+		foo()
 	}
-
-	// or ...
-	#catch { bar() } {
-		ABORT_ON_ERROR; // if non-zero returned.
-	}
-
+	
+	if (err) { printf("ERR: %s\n", err); abort() }
 	return 0;
 }
