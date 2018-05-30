@@ -38,7 +38,7 @@ void foo(struct bar b); // automatic forward-declaration
 
 dict_t foo(struct bar b)
 {
-	list_t li = #list();
+	list_t li = list();
 
 	list_len(li)
 	list_reverse(li)
@@ -53,11 +53,11 @@ dict_t foo(struct bar b)
 		free(item);
 	}
 
-	dict_t d = #box {
-		"name" = 12;
-		"-age" = strdup(12);
-		"ex" = list("ammy", "bob", "tim");
-	};
+	foo(dict, 12, a, b, c)
+
+	dict_t d = dict(
+		"name" : 12
+	);
 
 	free(d#["age"]);
 
