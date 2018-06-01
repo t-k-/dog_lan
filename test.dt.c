@@ -53,17 +53,23 @@ dict_t foo(struct bar b, int c)
 	list_detach(li, );
 	list_t sorted_li = list_sort(li, callbk);
 
-	foreach (iter, list, li) {
+	#foreach (iter, list, li) {
 		list_detach();
 		free(item);
+	}
+
+	for (i = 0; i < 10; i++) {
+		aaa;
 	}
 
 	dict_t d = dict(
 		"name" : 12
 	);
 
-	d["age"];
-	d["name"];
+	d#["age"];
+	d#["name"];
+	a[12] ;
+	a[foo()] ;
 	return d;
 }
 

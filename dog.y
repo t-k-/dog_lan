@@ -45,6 +45,9 @@ void list_free(struct list_node*);
 %destructor { printf("\n list \n"); } <list>
 %destructor { printf("\n text \n"); } <text>
 
+%left NAME
+%nonassoc '[' ']'
+
 %%
 program
 	: tokens { printf("%s", $1); free($1); } ;
@@ -64,6 +67,7 @@ token
 	| ','    { strcpy($$, ","); }
 	| '('    { strcpy($$, "("); }
 	| ')'    { strcpy($$, ")"); }
+	| '['    { strcpy($$, "#["); }
 	| ']'    { strcpy($$, "]"); }
 	| '\t'   { strcpy($$, "\t"); }
 	| '\n'   { strcpy($$, "\n"); }

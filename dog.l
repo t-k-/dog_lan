@@ -10,7 +10,7 @@ WS  [ \t\v\n\f]
 #include "dog.tab.h"
 
 #define COPY strcpy(yylval.token, yytext)
-#define PRINT // if (yytext[0] == '\n') printf("\n"); else printf("[%s]", yytext)
+#define PRINT if (yytext[0] == '\n') printf("\n"); else printf("[%s]", yytext)
 %}
 
 %x comment
@@ -18,7 +18,7 @@ WS  [ \t\v\n\f]
 %%
 
  /* comments */
-"//".*[\n]                             {}
+"//".*                                 {}
 "/*"                                   { BEGIN(comment); }
 <comment>.                             {}
 <comment>\n                            {}
@@ -32,7 +32,7 @@ WS  [ \t\v\n\f]
 ({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+      { PRINT; COPY; return QUOTED; }
 
  /* keywords */
-"foreach"                              { return _FOREACH; }
+"#foreach"                              { return _FOREACH; }
 
  /* names */
 {L}{A}*                                { PRINT; COPY; return NAME; }
@@ -43,7 +43,7 @@ WS  [ \t\v\n\f]
 ")"                                    { PRINT; return ')'; }
 "{"                                    { PRINT; return '{'; }
 "}"                                    { PRINT; return '}'; }
-"["                                    { PRINT; return '['; }
+"#["                                   { PRINT; return '['; }
 "]"                                    { PRINT; return ']'; }
 
  /* spaces */
@@ -53,6 +53,7 @@ WS  [ \t\v\n\f]
 [ ]+                                   { }
 
  /* tokens */
-[^ \t\n,(){}\[\]]+                     { PRINT; COPY; return TOKEN; }
+#+{A}*                                 { PRINT; COPY; return TOKEN; }
+[^ \t\n,(){}#\]]+                      { PRINT; COPY; return TOKEN; }
 
 %%
