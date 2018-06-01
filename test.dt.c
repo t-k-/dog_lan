@@ -11,7 +11,7 @@ struct foo {
 	dict_t d;
 };
 
-} // ============ //
+} /* ============ */
 
 #header "common.h" {
 
@@ -36,7 +36,12 @@ struct bar {
 void foo(struct bar b); // automatic forward-declaration
 // #(put just above the first function.)
 
-dict_t foo(struct bar b)
+/*
+ *
+ * multi-line comments example
+ * a /b bla bla
+ */
+dict_t foo(struct bar b, int c)
 {
 	list_t li = list();
 
@@ -48,33 +53,21 @@ dict_t foo(struct bar b)
 	list_detach(li, );
 	list_t sorted_li = list_sort(li, callbk);
 
-	#foreach (iter, list, li) {
+	foreach (iter, list, li) {
 		list_detach();
 		free(item);
 	}
-
-	foo(dict, 12, a, b, c)
 
 	dict_t d = dict(
 		"name" : 12
 	);
 
-	free(d#["age"]);
-
-	d#["age"] = #malloc(int);
-	d#["ex"] = #list("ammy", "bob", "tim");
+	d["age"];
+	d["name"];
 	return d;
 }
 
 int main()
 {
-	int age;
-	list ex;
-	char *err;
-	#unbox (age, ex, err) {
-		foo()
-	}
-	
-	if (err) { printf("ERR: %s\n", err); abort() }
 	return 0;
 }

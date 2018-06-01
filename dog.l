@@ -10,23 +10,29 @@ WS  [ \t\v\n\f]
 #include "dog.tab.h"
 
 #define COPY strcpy(yylval.token, yytext)
-#define PRINT //if (yytext[0] == '\n') printf("\n"); else printf("[%s]", yytext)
+#define PRINT // if (yytext[0] == '\n') printf("\n"); else printf("[%s]", yytext)
 %}
+
+%x comment
 
 %%
 
  /* comments */
-"//".*                                 { PRINT; COPY; return TOKEN; }
+"//".*[\n]                             {}
+"/*"                                   { BEGIN(comment); }
+<comment>.                             {}
+<comment>\n                            {}
+<comment>"*/"                          { BEGIN(INITIAL); }
 
  /* special treatment for C */
 "\\""\n"                               { COPY; return TOKEN; }
 "#define"[ ]+{L}{A}*"("                { COPY; return TOKEN; }
 
  /* quoted string */
-({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+      { PRINT; COPY; return TOKEN; }
+({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+      { PRINT; COPY; return QUOTED; }
 
  /* keywords */
-foreach                                { return _FOREACH; }
+"foreach"                              { return _FOREACH; }
 
  /* names */
 {L}{A}*                                { PRINT; COPY; return NAME; }
@@ -37,7 +43,8 @@ foreach                                { return _FOREACH; }
 ")"                                    { PRINT; return ')'; }
 "{"                                    { PRINT; return '{'; }
 "}"                                    { PRINT; return '}'; }
-"\n"                                   { PRINT; return '\n'; }
+"["                                    { PRINT; return '['; }
+"]"                                    { PRINT; return ']'; }
 
  /* spaces */
 
@@ -46,6 +53,6 @@ foreach                                { return _FOREACH; }
 [ ]+                                   { }
 
  /* tokens */
-[^ \t\n,(){}]+                         { PRINT; COPY; return TOKEN; }
+[^ \t\n,(){}\[\]]+                     { PRINT; COPY; return TOKEN; }
 
 %%

@@ -30,6 +30,7 @@ void list_free(struct list_node*);
 }
 
 %token _FOREACH
+%token <token> QUOTED
 %token <token> TOKEN
 %token <token> NAME
 
@@ -38,6 +39,7 @@ void list_free(struct list_node*);
 %type <text> block
 %type <list> namelist
 %type <text> foreach
+%type <text> keysubs
 
 %destructor { printf("\n token \n"); } <token>
 %destructor { printf("\n list \n"); } <list>
@@ -52,14 +54,17 @@ tokens
 	| tokens token   { $$ = tok_cat(2, $1, $2); free($1); }
 	| tokens block   { $$ = tok_cat(4, $1, "{", $2, "}"); free($1); free($2); }
 	| tokens foreach { $$ = tok_cat(4, $1, "{", $2, "}"); free($1); free($2); }
+	| tokens keysubs { $$ = tok_cat(2, $1, $2); free($1); free($2); }
 	;
 
 token
 	: TOKEN  { strcpy($$, $1); }
+	| QUOTED { strcpy($$, $1); }
 	| NAME   { strcpy($$, $1); }
 	| ','    { strcpy($$, ","); }
 	| '('    { strcpy($$, "("); }
 	| ')'    { strcpy($$, ")"); }
+	| ']'    { strcpy($$, "]"); }
 	| '\t'   { strcpy($$, "\t"); }
 	| '\n'   { strcpy($$, "\n"); }
 	;
@@ -89,6 +94,13 @@ foreach
 		);
 
 		list_free($3);
+	}
+	;
+
+keysubs
+	:  NAME '[' QUOTED ']' {
+		$$ = tokcat(5,
+			"(*strmap_val_ptr(", $1, ", ", $3, "))");
 	}
 	;
 %%
